@@ -6,6 +6,7 @@
 //
 
 #import "CoreData+MagicalRecord.h"
+#import "SynchronizationCoordinator.h"
 
 static NSPersistentStoreCoordinator *defaultCoordinator_ = nil;
 NSString * const kMagicalRecordPSCDidCompleteiCloudSetupNotification = @"kMagicalRecordPSCDidCompleteiCloudSetupNotification";
@@ -72,6 +73,30 @@ NSString * const kMagicalRecordPSCDidCompleteiCloudSetupNotification = @"kMagica
                                                          error:&error];
     if (!store) 
     {
+		[SynchronizationCoordinator resetHasSynced];
+		NSMutableString *logMessage = [NSMutableString stringWithString:@"All your database are belong to us, so we be wiping them.  "];
+		NSFileManager   *fileMgr    = [NSFileManager defaultManager];
+		NSError         *fileError  = nil;
+		// get a list of files in the app docs directory
+		NSArray         *contentsOfDir = [fileMgr contentsOfDirectoryAtPath:[IMCoreDataManager applicationDocumentsDirectory] error:&fileError];
+		if (!contentsOfDir) {
+			contentsOfDir = [fileMgr contentsOfDirectoryAtPath:[NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES)lastObject] error:&fileError];
+		}
+		// loop each
+		for (NSString *item in contentsOfDir)
+		{
+			// check for ending in ".sqlite"
+			if ([item rangeOfString:@".sqlite" options:NSCaseInsensitiveSearch].location != NSNotFound)
+			{
+				// remove it.  This will also remove testData.sqlite but we're not using that at the time of writing this.
+				BOOL removed = [fileMgr removeItemAtPath:[[IMCoreDataManager applicationDocumentsDirectory] stringByAppendingPathComponent:item] error:&fileError];
+				if (!removed) {
+					removed = [fileMgr removeItemAtPath:[[NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES)lastObject] stringByAppendingPathComponent:item] error:&fileError];
+				}
+				[logMessage appendFormat:@"\n  removed:%@ file:%@", (removed ? @"YES" : @"NO"), item];
+			}
+		}
+		IMLogWarning(logMessage);
         [MagicalRecordHelpers handleErrors:error];
     }
     return store;
