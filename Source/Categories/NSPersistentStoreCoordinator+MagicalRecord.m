@@ -86,7 +86,7 @@ NSString * const kMagicalRecordPSCDidCompleteiCloudSetupNotification = @"kMagica
 		for (NSString *item in contentsOfDir)
 		{
 			// check for ending in ".sqlite"
-			if ([item rangeOfString:@".sqlite" options:NSCaseInsensitiveSearch].location != NSNotFound)
+			if ([item rangeOfString:storeFileName options:NSCaseInsensitiveSearch].location != NSNotFound)
 			{
 				// remove it.  This will also remove testData.sqlite but we're not using that at the time of writing this.
 				BOOL removed = [fileMgr removeItemAtPath:[[IMCoreDataManager applicationDocumentsDirectory] stringByAppendingPathComponent:item] error:&fileError];
