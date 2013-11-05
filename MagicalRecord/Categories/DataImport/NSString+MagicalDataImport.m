@@ -11,14 +11,10 @@
 
 @implementation NSString (MagicalRecord_DataImport)
 
-- (NSString *) MR_capitalizedFirstCharacterString;
+- (NSString *) MR_capitalizedFirstCharaterString;
 {
-    if ([self length] > 0)
-    {
-        NSString *firstChar = [[self substringToIndex:1] capitalizedString];
-        return [firstChar stringByAppendingString:[self substringFromIndex:1]];
-    }
-    return self;
+    NSString *firstChar = [[self substringToIndex:1] capitalizedString];
+    return [firstChar stringByAppendingString:[self substringFromIndex:1]];
 }
 
 @end
