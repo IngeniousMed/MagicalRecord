@@ -4,7 +4,6 @@
 //  Created by Saul Mora on 11/23/09.
 //  Copyright 2010 Magical Panda Software, LLC All rights reserved.
 //
-
 #import "MagicalRecordHelpers.h"
 
 extern NSString * const kMagicalRecordDidMergeChangesFromiCloudNotification;
@@ -30,7 +29,9 @@ extern NSString * const kMagicalRecordDidMergeChangesFromiCloudNotification;
 + (void) MR_resetDefaultContext;
 + (NSManagedObjectContext *)MR_defaultContext;
 + (void) MR_setDefaultContext:(NSManagedObjectContext *)moc;
++ (void) MR_setSharedDefaultContext:(NSManagedObjectContext *)moc;
 + (void) MR_resetContextForCurrentThread;
++ (NSManagedObjectContext *)MR_defaultSharedContext;
 
 + (NSManagedObjectContext *) MR_context;
 + (NSManagedObjectContext *) MR_contextForCurrentThread;

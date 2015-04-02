@@ -10,6 +10,7 @@
 
 @implementation NSRelationshipDescription (MagicalRecord_DataImport)
 
+#ifndef WATCH_TARGET
 - (NSString *) MR_primaryKey;
 {
     NSString *primaryKeyName = [[self userInfo] valueForKey:kMagicalRecordImportRelationshipPrimaryKey] ?: 
@@ -17,5 +18,5 @@
     
     return primaryKeyName;
 }
-
+#endif
 @end

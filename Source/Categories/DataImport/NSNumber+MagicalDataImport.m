@@ -12,6 +12,7 @@
 
 @implementation NSNumber (MagicalRecord_DataImport)
 
+#ifndef WATCH_TARGET
 - (id) MR_relatedValueForRelationship:(NSRelationshipDescription *)relationshipInfo
 {
     return self;
@@ -21,5 +22,5 @@
 {
     return nil;
 }
-
+#endif
 @end

@@ -17,10 +17,13 @@ extern NSString * const kMagicalRecordDefaultStoreFileName;
 + (NSURL *) MR_defaultLocalStoreUrl;
 
 + (NSPersistentStore *) MR_defaultPersistentStore;
++ (NSPersistentStore *) MR_sharedDefaultPersistentStore;
+
 + (void) MR_setDefaultPersistentStore:(NSPersistentStore *) store;
 
 + (NSURL *) MR_urlForStoreName:(NSString *)storeFileName;
 + (NSURL *) MR_cloudURLForUbiqutiousContainer:(NSString *)bucketName;
++ (void) MR_setSharedDefaultPersistentStore:(NSPersistentStore *) store;
 
 @end
 

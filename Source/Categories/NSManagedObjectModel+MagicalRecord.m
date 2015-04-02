@@ -11,6 +11,7 @@
 
 
 static NSManagedObjectModel *defaultManagedObjectModel_ = nil;
+static NSManagedObjectModel *defaultSharedManagedObjectModel_ = nil;
 
 @implementation NSManagedObjectModel (MagicalRecord)
 
@@ -18,9 +19,18 @@ static NSManagedObjectModel *defaultManagedObjectModel_ = nil;
 {
 	if (defaultManagedObjectModel_ == nil && [MagicalRecordHelpers shouldAutoCreateManagedObjectModel])
 	{
-        [self MR_setDefaultManagedObjectModel:[self MR_mergedObjectModelFromMainBundle]];
+        [self MR_setDefaultManagedObjectModel:[self MR_newManagedObjectModelNamed:@"IMBills.DomainEntities"]];
 	}
 	return defaultManagedObjectModel_;
+}
+
++ (NSManagedObjectModel *) MR_sharedDefaultManagedObjectModel
+{
+	if (defaultSharedManagedObjectModel_ == nil && [MagicalRecordHelpers shouldAutoCreateManagedObjectModel])
+	{
+		defaultSharedManagedObjectModel_ = [self MR_newManagedObjectModelNamed:@"WatchData"];
+	}
+	return defaultSharedManagedObjectModel_;
 }
 
 + (void) MR_setDefaultManagedObjectModel:(NSManagedObjectModel *)newDefaultModel
@@ -57,9 +67,7 @@ static NSManagedObjectModel *defaultManagedObjectModel_ = nil;
 
 + (NSManagedObjectModel *) MR_newManagedObjectModelNamed:(NSString *)modelFileName
 {
-	NSString *path = [[NSBundle mainBundle] pathForResource:[modelFileName stringByDeletingPathExtension] 
-                                                     ofType:[modelFileName pathExtension]];
-	NSURL *momURL = [NSURL fileURLWithPath:path];
+	NSURL *momURL = [[NSBundle mainBundle] URLForResource:modelFileName withExtension:@"momd"];
 	
 	NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:momURL];
 	return model;

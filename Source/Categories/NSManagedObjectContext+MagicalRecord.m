@@ -9,6 +9,7 @@
 #import <objc/runtime.h>
 
 static NSManagedObjectContext *defaultManageObjectContext_ = nil;
+static NSManagedObjectContext *sharedDefaultManageObjectContext_ = nil;
 static NSString const * kMagicalRecordManagedObjectContextKey = @"MagicalRecord_NSManagedObjectContextForThreadKey";
 static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMagicalRecordNotifiesMainContextOnSave";
        NSString * const kMagicalRecordDidMergeChangesFromiCloudNotification = @"kMagicalRecordDidMergeChangesFromiCloudNotification";
@@ -30,6 +31,14 @@ static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMag
 	}
 }
 
++ (NSManagedObjectContext *)MR_defaultSharedContext
+{
+	@synchronized (self)
+	{
+		return sharedDefaultManageObjectContext_;
+	}
+}
+
 + (void) MR_setDefaultContext:(NSManagedObjectContext *)moc
 {
     NSPersistentStoreCoordinator *coordinator = [NSPersistentStoreCoordinator MR_defaultStoreCoordinator];
@@ -47,6 +56,25 @@ static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMag
     {
         [defaultManageObjectContext_ MR_observeiCloudChangesInCoordinator:coordinator];
     }
+}
+
++ (void) MR_setSharedDefaultContext:(NSManagedObjectContext *)moc
+{
+	NSPersistentStoreCoordinator *coordinator = [NSPersistentStoreCoordinator MR_sharedDefaultCoordinator];
+	if ([MagicalRecordHelpers isICloudEnabled])
+	{
+		[sharedDefaultManageObjectContext_ MR_stopObservingiCloudChangesInCoordinator:coordinator];
+	}
+	
+	MR_RETAIN(moc);
+	MR_RELEASE(defaultManageObjectContext_);
+	
+	sharedDefaultManageObjectContext_ = moc;
+	
+	if ([MagicalRecordHelpers isICloudEnabled])
+	{
+		[sharedDefaultManageObjectContext_ MR_observeiCloudChangesInCoordinator:coordinator];
+	}
 }
 
 + (void)MR_resetDefaultContext

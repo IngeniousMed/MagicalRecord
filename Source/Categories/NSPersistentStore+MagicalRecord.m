@@ -11,6 +11,7 @@
 NSString * const kMagicalRecordDefaultStoreFileName = @"CoreDataStore.sqlite";
 
 static NSPersistentStore *defaultPersistentStore_ = nil;
+static NSPersistentStore *sharedDefaultPersistentStore_ = nil;
 
 
 @implementation NSPersistentStore (MagicalRecord)
@@ -20,11 +21,24 @@ static NSPersistentStore *defaultPersistentStore_ = nil;
 	return defaultPersistentStore_;
 }
 
++ (NSPersistentStore *) MR_sharedDefaultPersistentStore
+{
+	return sharedDefaultPersistentStore_;
+}
+
+
 + (void) MR_setDefaultPersistentStore:(NSPersistentStore *) store
 {
     MR_RETAIN(store);
     MR_RELEASE(defaultPersistentStore_);
 	defaultPersistentStore_ = store;
+}
+
++ (void) MR_setSharedDefaultPersistentStore:(NSPersistentStore *) store
+{
+	MR_RETAIN(store);
+	MR_RELEASE(defaultPersistentStore_);
+	sharedDefaultPersistentStore_ = store;
 }
 
 + (NSString *) MR_directory:(int) type

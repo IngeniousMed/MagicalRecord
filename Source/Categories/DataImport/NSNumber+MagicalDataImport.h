@@ -10,7 +10,8 @@
 
 @interface NSNumber (MagicalRecord_DataImport)
 
+#ifndef WATCH_TARGET
 - (NSString *) MR_lookupKeyForAttribute:(NSAttributeDescription *)attributeInfo;
 - (id) MR_relatedValueForRelationship:(NSRelationshipDescription *)relationshipInfo;
-
+#endif
 @end

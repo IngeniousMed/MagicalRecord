@@ -20,5 +20,6 @@
 + (NSManagedObjectModel *) MR_managedObjectModelNamed:(NSString *)modelFileName;
 + (NSManagedObjectModel *) MR_newModelNamed:(NSString *) modelName inBundleNamed:(NSString *) bundleName NS_RETURNS_RETAINED;
 + (NSManagedObjectModel *) MR_mergedObjectModelFromMainBundle;
++ (NSManagedObjectModel *) MR_sharedDefaultManagedObjectModel;
 
 @end

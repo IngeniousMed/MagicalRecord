@@ -48,6 +48,7 @@ typedef void (^CoreDataBlock)(NSManagedObjectContext *context);
 + (void) setupAutoMigratingCoreDataStack;
 
 + (void) setupCoreDataStackWithStoreNamed:(NSString *)storeName;
++ (void) setupSharedCoreDataStackWithStoreNamed:(NSString *)storeName;
 + (void) setupCoreDataStackWithAutoMigratingSqliteStoreNamed:(NSString *)storeName;
 
 #pragma mark - iCloud Support
@@ -76,6 +77,7 @@ NSDate * dateFromString(NSString *value, NSString *format);
 NSString * attributeNameFromString(NSString *value);
 NSString * primaryKeyNameFromString(NSString *value);
 
+#ifndef WATCH_TARGET
 #if TARGET_OS_IPHONE
 
 UIColor * UIColorFromString(NSString *serializedColor);
@@ -84,6 +86,7 @@ UIColor * UIColorFromString(NSString *serializedColor);
 
 NSColor * NSColorFromString(NSString *serializedColor);
 
+#endif
 #endif
 extern id (*colorFromString)(NSString *);
 

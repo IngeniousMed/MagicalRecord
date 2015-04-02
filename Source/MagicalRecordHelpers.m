@@ -155,10 +155,22 @@ void replaceSelectorForTargetWithSourceImpAndSwizzle(Class originalClass, SEL or
 + (void) setupCoreDataStackWithStoreNamed:(NSString *)storeName
 {
 	NSPersistentStoreCoordinator *coordinator = [NSPersistentStoreCoordinator MR_coordinatorWithSqliteStoreNamed:storeName];
+	
+
 	[NSPersistentStoreCoordinator MR_setDefaultStoreCoordinator:coordinator];
 	
 	NSManagedObjectContext *context = [NSManagedObjectContext MR_contextWithStoreCoordinator:coordinator];
+	
 	[NSManagedObjectContext MR_setDefaultContext:context];
+	[self setupSharedCoreDataStackWithStoreNamed:storeName];
+}
+
++(void)setupSharedCoreDataStackWithStoreNamed:(NSString *)storeName
+{
+	NSPersistentStoreCoordinator *sharedCoordinator = [NSPersistentStoreCoordinator MR_sharedCoordinatorWithSqliteStoreNamed:storeName];
+	[NSPersistentStoreCoordinator MR_setSharedDefaultStoreCoordinator:sharedCoordinator];
+	NSManagedObjectContext *sharedContext = [NSManagedObjectContext MR_contextWithStoreCoordinator:sharedCoordinator];
+	[NSManagedObjectContext MR_setSharedDefaultContext:sharedContext];
 }
 
 + (void) setupCoreDataStackWithAutoMigratingSqliteStoreNamed:(NSString *)storeName
@@ -450,7 +462,7 @@ NSInteger* newColorComponentsFromString(NSString *serializedColor)
     //else if ([colorType hasPrefix:@""])
     return componentValues;
 }
-
+#ifndef WATCH_TARGET
 #if TARGET_OS_IPHONE
 
 UIColor * UIColorFromString(NSString *serializedColor)
@@ -467,7 +479,6 @@ UIColor * UIColorFromString(NSString *serializedColor)
 id (*colorFromString)(NSString *) = UIColorFromString;
 
 #else
-
 NSColor * NSColorFromString(NSString *serializedColor)
 {
     NSInteger *componentValues = newColorComponentsFromString(serializedColor);
@@ -481,4 +492,5 @@ NSColor * NSColorFromString(NSString *serializedColor)
 id (*colorFromString)(NSString *) = NSColorFromString;
 
 
+#endif
 #endif
