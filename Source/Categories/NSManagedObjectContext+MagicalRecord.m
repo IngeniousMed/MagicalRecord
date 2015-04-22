@@ -11,6 +11,7 @@
 static NSManagedObjectContext *defaultManageObjectContext_ = nil;
 static NSManagedObjectContext *sharedDefaultManageObjectContext_ = nil;
 static NSString const * kMagicalRecordManagedObjectContextKey = @"MagicalRecord_NSManagedObjectContextForThreadKey";
+static NSString const * kMagicalRecordSharedManagedObjectContextKey = @"MagicalRecord_NSManagedObjectSharedContextForThreadKey";
 static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMagicalRecordNotifiesMainContextOnSave";
        NSString * const kMagicalRecordDidMergeChangesFromiCloudNotification = @"kMagicalRecordDidMergeChangesFromiCloudNotification";
 
@@ -286,6 +287,24 @@ static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMag
 }
 
 #pragma mark - Creation Helpers
++(NSManagedObjectContext *)MR_sharedContextForCurrentThread
+{
+	if ([NSThread isMainThread])
+	{
+		return [self MR_defaultSharedContext];
+	}
+	else
+	{
+		NSMutableDictionary *threadDict = [[NSThread currentThread] threadDictionary];
+		NSManagedObjectContext *threadContext = [threadDict objectForKey:kMagicalRecordSharedManagedObjectContextKey];
+		if (threadContext == nil)
+		{
+			threadContext = [self MR_sharedContextThatNotifiesDefaultContextOnMainThread];
+			[threadDict setObject:threadContext forKey:kMagicalRecordSharedManagedObjectContextKey];
+		}
+		return threadContext;
+	}
+}
 
 + (NSManagedObjectContext *) MR_contextForCurrentThread;
 {
@@ -340,6 +359,31 @@ static void const * kMagicalRecordNotifiesMainContextAssociatedValueKey = @"kMag
 + (NSManagedObjectContext *) MR_context;
 {
 	return [self MR_contextWithStoreCoordinator:[NSPersistentStoreCoordinator MR_defaultStoreCoordinator]];
+}
+
++(NSManagedObjectContext *)MR_sharedContext
+{
+	return [self MR_contextWithStoreCoordinator:[NSPersistentStoreCoordinator MR_sharedDefaultCoordinator]];
+}
+
++(NSManagedObjectContext *)MR_sharedContextThatNotifiesDefaultContextOnMainThread
+{
+	NSManagedObjectContext *context = nil;
+	
+	THREAD_ISOLATION_ENABLED
+	(
+	 MRLog(@"Using Thread Isolation Mode");
+	 context = [self MR_sharedContext];
+	 )
+	
+	PRIVATE_QUEUES_ENABLED
+	(
+	 MRLog(@"Using Private queue mode");
+	 context = [[self alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+	 [context setParentContext:[NSManagedObjectContext MR_defaultSharedContext]];
+	 
+	 )
+	return context;
 }
 
 + (NSManagedObjectContext *) MR_contextThatNotifiesDefaultContextOnMainThread;
